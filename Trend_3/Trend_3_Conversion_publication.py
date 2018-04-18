@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 import json
 import csv
@@ -25,24 +26,28 @@ for path in path_list:
         csv_dict[conference][year] = {}
     with open(path_str) as content:
         publication = json.loads(content.read())
-        if publication['algorithms']['algorithm'][0]["@name"] == 'SectLabel':
+        if publication['algorithms']['algorithm'][1]["@name"] == 'ParsHed':
+            if "author" in publication['algorithms']['algorithm'][1]["variant"]:
+                authors = publication['algorithms']['algorithm'][1]["variant"]["author"]
+                if isinstance(authors, dict):
+                    authors = [authors]
+                for author_bundle in authors:
+                    author_list = re.split('; |, |\n', author_bundle['#text'])
+                    for author in author_list:
+                        if author not in csv_dict[conference][year]:
+                            csv_dict[conference][year][author] = 0
+                        csv_dict[conference][year][author] += 1
+        elif publication['algorithms']['algorithm'][0]["@name"] == 'SectLabel':
             if "author" in publication['algorithms']['algorithm'][0]["variant"]:
                 authors = publication['algorithms']['algorithm'][0]["variant"]["author"]
                 if isinstance(authors, dict):
                     authors = [authors]
-                for author in authors:
-                    if author['#text'] not in csv_dict[conference][year]:
-                        csv_dict[conference][year][author['#text']] = 0
-                    csv_dict[conference][year][author['#text']] += 1
-        elif publication['algorithms']['algorithm'][1]["@name"] == 'ParsHed':
-            if "author" in publication['algorithms']['algorithm'][0]["variant"]:
-                authors = publication['algorithms']['algorithm'][0]["variant"]["author"]
-                if isinstance(authors, dict):
-                    authors = [authors]
-                for author in authors:
-                    if author['#text'] not in csv_dict[conference][year]:
-                        csv_dict[conference][year][author['#text']] = 0
-                    csv_dict[conference][year][author['#text']] += 1
+                for author_bundle in authors:
+                    author_list = re.split('; |, |\n', author_bundle['#text'])
+                    for author in author_list:
+                        if author not in csv_dict[conference][year]:
+                            csv_dict[conference][year][author] = 0
+                        csv_dict[conference][year][author] += 1
         else:
             no_header_list.append(path_str)
 

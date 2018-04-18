@@ -27,7 +27,6 @@ for path in path_list:
         publication = json.loads(content.read())
         last_index = len(publication['algorithms']['algorithm']) - 1
         if publication['algorithms']['algorithm'][last_index]["@name"] == 'ParsCit':
-            print(path_str)
             if publication['algorithms']['algorithm'][last_index]["citationList"] is not None:
                 citation_list = publication['algorithms']['algorithm'][last_index]["citationList"]["citation"]
                 if isinstance(citation_list, dict):
@@ -48,7 +47,7 @@ for conference in csv_dict:
         row = [conference, year, csv_dict[conference][year]["valid"], csv_dict[conference][year]["invalid"]]
         aggregated_dict_list.append(row)
 
-with open('data.csv', 'w') as f:
+with open('citations.csv', 'w') as f:
     writer = csv.writer(f)
     writer.writerow(["Conference", "Year", "No. of valid citations", "No. of invalid citations"])
     writer.writerows(aggregated_dict_list)

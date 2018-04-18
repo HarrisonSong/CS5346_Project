@@ -53,7 +53,7 @@ for path in path_list:
             no_header_list.append(path_str)
 
 aggregated_dict_list = []
-for conference in csv_dict:
+for conference in sorted(csv_dict):
     for year in sorted(csv_dict[conference]):
         row = [conference, year, len(csv_dict[conference][year].keys())]
         aggregated_dict_list.append(row)

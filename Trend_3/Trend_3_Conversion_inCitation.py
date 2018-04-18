@@ -1,3 +1,4 @@
+import re
 from pathlib import Path
 import json
 import csv
@@ -27,7 +28,6 @@ for path in path_list:
         publication = json.loads(content.read())
         last_index = len(publication['algorithms']['algorithm']) - 1
         if publication['algorithms']['algorithm'][last_index]["@name"] == 'ParsCit':
-            print(path_str)
             if publication['algorithms']['algorithm'][last_index]["citationList"] is not None:
                 citation_list = publication['algorithms']['algorithm'][last_index]["citationList"]["citation"]
                 if isinstance(citation_list, dict):
@@ -38,10 +38,12 @@ for path in path_list:
                             authors = citation["authors"]["author"]
                             if isinstance(authors, str):
                                 authors = [authors]
-                            for author in authors:
-                                if author not in csv_dict[conference][year]:
-                                    csv_dict[conference][year][author] = 0
-                                csv_dict[conference][year][author] += 1
+                            for author_bundle in authors:
+                                author_list = re.split('; |, |\n', author_bundle)
+                                for author in author_list:
+                                    if author not in csv_dict[conference][year]:
+                                        csv_dict[conference][year][author] = 0
+                                    csv_dict[conference][year][author] += 1
 
         else:
             no_citation_list.append(path_str)
